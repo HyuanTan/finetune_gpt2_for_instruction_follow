@@ -42,6 +42,9 @@ def train_model_simple(model, train_loader, val_loader, optimizer, device, num_e
     # Initialize lists to track losses and tokens seen
     train_losses, val_losses, track_tokens_seen = [], [], []
     tokens_seen, global_step = 0, -1
+    
+    best_val_loss = float('inf')
+    best_model_state_dict = None
 
     # Main training loop
     for epoch in range(num_epochs):
@@ -62,6 +65,11 @@ def train_model_simple(model, train_loader, val_loader, optimizer, device, num_e
                 train_losses.append(train_loss)
                 val_losses.append(val_loss)
                 track_tokens_seen.append(tokens_seen)
+
+                if val_loss < best_val_loss:
+                    best_val_loss = val_loss
+                    best_model_state_dict = model.state_dict()
+        
                 print(f"Ep {epoch+1} (Step {global_step:06d}): "
                       f"Train loss {train_loss:.3f}, Val loss {val_loss:.3f}")
 
@@ -70,5 +78,5 @@ def train_model_simple(model, train_loader, val_loader, optimizer, device, num_e
             model, tokenizer, device, start_context
         )
 
-    return train_losses, val_losses, track_tokens_seen
+    return train_losses, val_losses, track_tokens_seen, best_model_state_dict
 
