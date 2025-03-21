@@ -119,7 +119,7 @@ def main(test_mode=False):
 
     num_epochs = 2
     torch.manual_seed(123)
-    train_losses, val_losses, tokens_seen = train_model_simple(
+    train_losses, val_losses, tokens_seen, best_model_state_dict= train_model_simple(
         model, train_loader, val_loader, optimizer, device,
         num_epochs=num_epochs, eval_freq=5, eval_iter=5,
         start_context=format_input(val_data[0]), tokenizer=tokenizer
@@ -162,6 +162,11 @@ def main(test_mode=False):
     file_name = f"./finetune_models/{re.sub(r'[ ()]', '', CHOOSE_MODEL) }-{num_epochs}-{dataset}-sft.pth"
     torch.save(model.state_dict(), file_name)
     print(f"Model saved as {file_name}")
+
+    file_name = f"./finetune_models/{re.sub(r'[ ()]', '', CHOOSE_MODEL) }-{num_epochs}-{dataset}-best_sft.pth"
+    torch.save(best_model_state_dict, file_name)
+    print(f"Best model (lowest val loss) saved as {file_name}")
+
 
 if __name__ == "__main__":
     enable_test_mode = False
