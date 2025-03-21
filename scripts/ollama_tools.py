@@ -3,6 +3,7 @@ import psutil
 import json
 import urllib.request
 from scripts.data_transform import format_input
+from tqdm import tqdm
 
 def check_if_running(process_name):
     running = False

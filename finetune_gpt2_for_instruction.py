@@ -15,10 +15,15 @@ from tqdm import tqdm
 
 def main(test_mode=False):
     ##################### Load and prepare dataset #########################
+    num_epochs = 2
+    num_workers = 0
+    batch_size = 2 #4 # 8
+    
     dataset = "alpaca_data_52k.json"
-    dataset = "instruction_data_1k.json"
+    # dataset = "instruction_data_1k.json"
     file_path = f"./dataset/{dataset}"
     data = load_file(file_path)
+    data = data[:2000]
     print("Number of entries:", len(data))
     ''' 
     print("Example entry:\n", data[50])
@@ -27,8 +32,8 @@ def main(test_mode=False):
     print(model_input + desired_response)
     '''
     
-    train_portion = int(len(data) * 0.85)  # 85% for training
-    test_portion = int(len(data) * 0.1)    # 10% for testing
+    train_portion = int(len(data) * 0.80)  # 80% for training
+    test_portion = int(len(data) * 0.15)    # 15% for testing
     val_portion = len(data) - train_portion - test_portion  # Remaining 5% for validation
 
     train_data = data[:train_portion]
@@ -56,9 +61,6 @@ def main(test_mode=False):
         device=device,
         allowed_max_length=1024
     )
-
-    num_workers = 0
-    batch_size = 4 # 8
 
     torch.manual_seed(123)
     #########################
@@ -117,7 +119,7 @@ def main(test_mode=False):
     start_time = time.time()
     optimizer = torch.optim.AdamW(model.parameters(), lr=0.00005, weight_decay=0.1)
 
-    num_epochs = 2
+    
     torch.manual_seed(123)
     train_losses, val_losses, tokens_seen, best_model_state_dict= train_model_simple(
         model, train_loader, val_loader, optimizer, device,
@@ -170,4 +172,5 @@ def main(test_mode=False):
 
 if __name__ == "__main__":
     enable_test_mode = False
+    # enable_test_mode = True
     main(test_mode=enable_test_mode)
